@@ -1,5 +1,5 @@
 Name:		zabbix
-Version:	4.2.1
+Version:	4.0.7
 Release:	1
 Summary:	The Enterprise-class open source monitoring solution
 Group:		Applications/Internet
@@ -30,8 +30,6 @@ Buildroot:	%{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 %endif
 
 BuildRequires:  gcc
-BuildRequires:  glibc-devel
-BuildRequires:  make
 BuildRequires:	mysql-devel
 BuildRequires:	postgresql-devel
 BuildRequires:	net-snmp-devel
@@ -42,11 +40,7 @@ BuildRequires:	unixODBC-devel
 BuildRequires:	curl-devel >= 7.13.1
 BuildRequires:	OpenIPMI-devel >= 2
 BuildRequires:	libssh2-devel >= 1.0.0
-%if 0%{?rhel} >= 7
-BuildRequires: java-1.8.0-openjdk-devel
-%else
-BuildRequires:	java-devel >= 1.6.0
-%endif
+BuildRequires:	java-1.8.0-openjdk-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	pcre-devel
 BuildRequires:	libevent-devel
@@ -55,6 +49,9 @@ BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %if 0%{?rhel} >= 7
 BuildRequires:	systemd
+%endif
+%if 0%{?build_server}
+BuildRequires:	iksemel-devel
 %endif
 
 %description
@@ -166,9 +163,9 @@ Zabbix proxy with SQLite3 database support.
 Summary:			Zabbix java gateway
 Group:				Applications/Internet
 %if 0%{?rhel} >= 7
-Requires:			java-headless >= 1.6.0
+Requires:			java-headless >= 1.8.0
 %else
-Requires:			java >= 1.6.0
+Requires:			java >= 1.8.0
 %endif
 %if 0%{?rhel} >= 7
 Requires(post):		systemd
@@ -329,7 +326,6 @@ cat database/postgresql/schema.sql > database/postgresql/create.sql
 cat database/postgresql/images.sql >> database/postgresql/create.sql
 cat database/postgresql/data.sql >> database/postgresql/create.sql
 gzip database/postgresql/create.sql
-gzip database/postgresql/timescaledb.sql
 %endif
 
 # sql files for proxyes
@@ -368,7 +364,7 @@ make %{?_smp_mflags}
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
 
 %if 0%{?build_server}
-build_flags="$build_flags --enable-server"
+build_flags="$build_flags --enable-server --with-jabber"
 %endif
 
 %configure $build_flags --with-mysql
@@ -964,7 +960,6 @@ fi
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING NEWS README
 %doc database/postgresql/create.sql.gz
-%doc database/postgresql/timescaledb.sql.gz
 %attr(0640,root,zabbix) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_server.conf
 %dir /usr/lib/zabbix/alertscripts
 %dir /usr/lib/zabbix/externalscripts
@@ -1005,4 +1000,3 @@ fi
 
 
 %changelog
-
