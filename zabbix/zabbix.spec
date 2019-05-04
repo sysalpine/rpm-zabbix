@@ -29,6 +29,12 @@ Buildroot:	%{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 %define build_server 1
 %endif
 
+%if 0%{?rhel} && 0%{?rhel} < 7
+%define systemd 0
+%else
+%define systemd 1
+%endif
+
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  make
@@ -53,7 +59,7 @@ BuildRequires:	libevent-devel
 %if 0%{?rhel} >= 6
 BuildRequires:	openssl-devel >= 1.0.1
 %endif
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 BuildRequires:	systemd
 %endif
 
@@ -67,7 +73,7 @@ Summary:			Zabbix Agent
 Group:				Applications/Internet
 Requires:			logrotate
 Requires(pre):		/usr/sbin/useradd
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(preun):	systemd
@@ -100,7 +106,7 @@ Zabbix sender command line utility
 Summary:			Zabbix proxy for MySQL or MariaDB database
 Group:				Applications/Internet
 Requires:			fping
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -122,7 +128,7 @@ Zabbix proxy with MySQL or MariaDB database support.
 Summary:			Zabbix proxy for PostgreSQL database
 Group:				Applications/Internet
 Requires:			fping
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -144,7 +150,7 @@ Zabbix proxy with PostgreSQL database support.
 Summary:			Zabbix proxy for SQLite3 database
 Group:				Applications/Internet
 Requires:			fping
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -165,12 +171,12 @@ Zabbix proxy with SQLite3 database support.
 %package java-gateway
 Summary:			Zabbix java gateway
 Group:				Applications/Internet
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires:			java-headless >= 1.6.0
 %else
 Requires:			java >= 1.6.0
 %endif
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -190,7 +196,7 @@ Zabbix java gateway
 Summary:			Zabbix server for MySQL or MariaDB database
 Group:				Applications/Internet
 Requires:			fping
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -212,7 +218,7 @@ Zabbix server with MySQL or MariaDB database support.
 Summary:			Zabbix server for PostgresSQL database
 Group:				Applications/Internet
 Requires:			fping
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires(post):		systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -233,7 +239,7 @@ Zabbix server with PostgresSQL database support.
 Summary:			Zabbix web frontend common package
 Group:				Application/Internet
 BuildArch:			noarch
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires:			httpd
 Requires:			php >= 5.4
 Requires:			php-gd
@@ -254,7 +260,7 @@ Zabbix web frontend common package
 Summary:			Zabbix web frontend for MySQL
 Group:				Applications/Internet
 BuildArch:			noarch
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires:			php-mysql
 %endif
 Requires:			zabbix-web = %{version}-%{release}
@@ -267,7 +273,7 @@ Zabbix web frontend for MySQL
 Summary:			Zabbix web frontend for PostgreSQL
 Group:				Applications/Internet
 BuildArch:			noarch
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 Requires:			php-pgsql
 %endif
 Requires:			zabbix-web = %{version}-%{release}
@@ -420,7 +426,7 @@ mv $RPM_BUILD_ROOT%{_datadir}/zabbix/alertscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 %endif
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/externalscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback.xml $RPM_BUILD_ROOT/%{_sysconfdir}/zabbix/zabbix_java_gateway_logback.xml
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback-console.xml
 mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java $RPM_BUILD_ROOT/%{_datadir}/zabbix-java-gateway
@@ -506,7 +512,7 @@ cat %{SOURCE3} | sed \
 	> $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-proxy
 
 # install startup scripts
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 install -Dm 0644 -p %{SOURCE10} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
 %if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE11} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
@@ -523,7 +529,7 @@ install -Dm 0755 -p %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-proxy
 %endif
 
 # install systemd-tmpfiles conf
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
 %if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
@@ -545,7 +551,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post agent
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-agent.service
 %else
 /sbin/chkconfig --add zabbix-agent || :
@@ -597,7 +603,7 @@ getent passwd zabbix > /dev/null || \
 
 
 %post proxy-mysql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
 %else
 /sbin/chkconfig --add zabbix-proxy
@@ -607,7 +613,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post proxy-pgsql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
 %else
 /sbin/chkconfig --add zabbix-proxy
@@ -617,7 +623,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post proxy-sqlite3
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
 %else
 /sbin/chkconfig --add zabbix-proxy
@@ -627,7 +633,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post java-gateway
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-java-gateway.service
 %else
 /sbin/chkconfig --add zabbix-java-gateway
@@ -636,7 +642,7 @@ getent passwd zabbix > /dev/null || \
 
 %if 0%{?build_server}
 %post server-mysql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-server.service
 %else
 /sbin/chkconfig --add zabbix-server
@@ -646,7 +652,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post server-pgsql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_post zabbix-server.service
 %else
 /sbin/chkconfig --add zabbix-server
@@ -668,7 +674,7 @@ getent passwd zabbix > /dev/null || \
 
 %preun agent
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-agent.service
 %else
 /sbin/service zabbix-agent stop >/dev/null 2>&1
@@ -680,7 +686,7 @@ fi
 
 %preun proxy-mysql
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
 %else
 /sbin/service zabbix-proxy stop >/dev/null 2>&1
@@ -693,7 +699,7 @@ fi
 
 %preun proxy-pgsql
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
 %else
 /sbin/service zabbix-proxy stop >/dev/null 2>&1
@@ -706,7 +712,7 @@ fi
 
 %preun proxy-sqlite3
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
 %else
 /sbin/service zabbix-proxy stop >/dev/null 2>&1
@@ -719,7 +725,7 @@ fi
 
 %preun java-gateway
 if [ $1 -eq 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-java-gateway.service
 %else
 /sbin/service zabbix-java-gateway stop >/dev/null 2>&1
@@ -731,7 +737,7 @@ fi
 %if 0%{?build_server}
 %preun server-mysql
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-server.service
 %else
 /sbin/service zabbix-server stop >/dev/null 2>&1
@@ -744,7 +750,7 @@ fi
 
 %preun server-pgsql
 if [ "$1" = 0 ]; then
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_preun zabbix-server.service
 %else
 /sbin/service zabbix-server stop >/dev/null 2>&1
@@ -771,7 +777,7 @@ fi
 %endif
 
 %postun agent
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-agent.service
 %else
 if [ $1 -ge 1 ]; then
@@ -780,7 +786,7 @@ fi
 %endif
 
 %postun proxy-mysql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
 %else
 if [ $1 -ge 1 ]; then
@@ -789,7 +795,7 @@ fi
 %endif
 
 %postun proxy-pgsql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
 %else
 if [ $1 -ge 1 ]; then
@@ -798,7 +804,7 @@ fi
 %endif
 
 %postun proxy-sqlite3
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
 %else
 if [ $1 -ge 1 ]; then
@@ -807,7 +813,7 @@ fi
 %endif
 
 %postun java-gateway
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-java-gateway.service
 %else
 if [ $1 -gt 1 ]; then
@@ -817,7 +823,7 @@ fi
 
 %if 0%{?build_server}
 %postun server-mysql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-server.service
 %else
 if [ $1 -ge 1 ]; then
@@ -826,7 +832,7 @@ fi
 %endif
 
 %postun server-pgsql
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-server.service
 %else
 if [ $1 -ge 1 ]; then
@@ -846,7 +852,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_sbindir}/zabbix_agentd
 %{_mandir}/man8/zabbix_agentd.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-agent.service
 %{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
 %else
@@ -876,7 +882,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 %else
@@ -894,7 +900,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 %else
@@ -912,7 +918,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 %else
@@ -926,7 +932,7 @@ fi
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_java_gateway.conf
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_datadir}/zabbix-java-gateway
 %{_sbindir}/zabbix_java_gateway
 %{_unitdir}/zabbix-java-gateway.service
@@ -949,7 +955,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_server.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-server.service
 %{_prefix}/lib/tmpfiles.d/zabbix-server.conf
 %else
@@ -969,7 +975,7 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_server.8*
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %{_unitdir}/zabbix-server.service
 %{_prefix}/lib/tmpfiles.d/zabbix-server.conf
 %else
@@ -983,7 +989,7 @@ fi
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
 %config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
-%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
+%if 0%{?systemd}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
 %else
 %doc conf/httpd22-example.conf conf/httpd24-example.conf
