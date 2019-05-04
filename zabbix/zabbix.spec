@@ -426,7 +426,7 @@ mv $RPM_BUILD_ROOT%{_datadir}/zabbix/alertscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 %endif
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/externalscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 
-%if 0%{?rhel} >=7 || 0%{?fedora} || 0%{?suse}
+%if !0%{?rhel} < 7
 mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback.xml $RPM_BUILD_ROOT/%{_sysconfdir}/zabbix/zabbix_java_gateway_logback.xml
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback-console.xml
 mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java $RPM_BUILD_ROOT/%{_datadir}/zabbix-java-gateway
