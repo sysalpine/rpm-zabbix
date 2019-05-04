@@ -44,11 +44,7 @@ BuildRequires:	unixODBC-devel
 BuildRequires:	curl-devel >= 7.13.1
 BuildRequires:	OpenIPMI-devel >= 2
 BuildRequires:	libssh2-devel >= 1.0.0
-%if 0%{?rhel} || 0%{?fedora}
-BuildRequires:	java-1.8.0-openjdk-devel
-%else
-BuildRequires: java-1_8_0-openjdk-devel
-%endif
+BuildRequires:	java-devel >= 1.6.0
 BuildRequires:	libxml2-devel
 BuildRequires:	pcre-devel
 BuildRequires:	libevent-devel
