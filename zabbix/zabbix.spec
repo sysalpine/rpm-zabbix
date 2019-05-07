@@ -25,9 +25,7 @@ Patch2:		fping3-sourceip-option.patch
 
 Buildroot:	%{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 
-%if 0%{?rhel} >= 6
 %define build_server 1
-%endif
 
 %if 0%{?rhel} && 0%{?rhel} < 7
 %define systemd 0
@@ -241,7 +239,6 @@ Summary:			Zabbix web frontend common package
 Group:				Application/Internet
 BuildArch:			noarch
 %if 0%{?rhel} >= 7
-Requires:			httpd
 Requires:			php >= 5.4
 Requires:			php-gd
 Requires:			php-bcmath
@@ -444,12 +441,12 @@ touch $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/zabbix.conf.php
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/conf/maintenance.inc.php $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/
 
 # drop config files in place
-%if 0%{?rhel} >=7 || 0%{?fedora} || 0%{?suse}
-install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/zabbix.conf
-%else
+#%if 0%{?rhel} >=7 || 0%{?fedora} || 0%{?suse}
+#install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/zabbix.conf
+#%else
 install -Dm 0644 -p %{SOURCE1} conf/httpd22-example.conf
 install -Dm 0644 -p %{SOURCE2} conf/httpd24-example.conf
-%endif
+#%endif
 %endif
 
 # install configuration files
@@ -988,11 +985,11 @@ fi
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
 %config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
-%if 0%{?rhel} >=7 || 0%{?fedora}
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
-%else
+#%if 0%{?rhel} >=7 || 0%{?fedora}
+#%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
+#%else
 %doc conf/httpd22-example.conf conf/httpd24-example.conf
-%endif
+#%endif
 %{_datadir}/zabbix
 
 %files web-mysql
@@ -1007,8 +1004,8 @@ fi
 
 
 %changelog
-* Sat May  4 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-1
-- Initial packages
-
 * Tue May  7 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-2
 - Fix tls for fedora and suse
+
+* Sat May  4 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-1
+- Initial packages
