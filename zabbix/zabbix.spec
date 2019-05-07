@@ -240,7 +240,6 @@ Summary:      Zabbix web frontend common package
 Group:        Application/Internet
 BuildArch:      noarch
 %if 0%{?systemd}
-Requires:      httpd
 Requires:      php >= 5.4
 Requires:      php-gd
 Requires:      php-bcmath
@@ -989,11 +988,11 @@ fi
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
 %config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
-%if 0%{?systemd}
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
-%else
+#%if 0%{?systemd}
+#%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
+#%else
 %doc conf/httpd22-example.conf conf/httpd24-example.conf
-%endif
+#%endif
 %{_datadir}/zabbix
 
 %files web-mysql
