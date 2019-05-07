@@ -444,12 +444,12 @@ touch $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/zabbix.conf.php
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/conf/maintenance.inc.php $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/
 
 # drop config files in place
-%if 0%{?rhel} >= 7 || 0%{?fedora}
-install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/zabbix.conf
-%else
+#%if 0%{?rhel} || 0%{?fedora}
+#install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/zabbix.conf
+#%else
 install -Dm 0644 -p %{SOURCE1} conf/httpd22-example.conf
 install -Dm 0644 -p %{SOURCE2} conf/httpd24-example.conf
-%endif
+#%endif
 %endif
 
 # install configuration files
