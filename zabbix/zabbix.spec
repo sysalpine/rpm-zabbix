@@ -1007,5 +1007,8 @@ fi
 
 
 %changelog
-* Sat May  4 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-1
+* Sat May  4 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-1
 - Initial packages
+
+* Tue May  7 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-2
+- Fix tls for fedora and suse
