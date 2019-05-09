@@ -9,15 +9,12 @@ Source0:  %{name}-%{version}%{?alphatag}.tar.gz
 Source1:  zabbix-web22.conf
 Source2:  zabbix-web24.conf
 Source3:  zabbix-logrotate.in
-Source4:  zabbix-java-gateway.init
 Source5:  zabbix-agent.init
 Source6:  zabbix-server.init
 Source7:  zabbix-proxy.init
 Source10: zabbix-agent.service
 Source11: zabbix-server.service
 Source12: zabbix-proxy.service
-Source13: zabbix-java-gateway.service
-Source14: zabbix_java_gateway-sysd
 Source15: zabbix-tmpfiles.conf
 Patch0:   config.patch
 Patch1:   fonts-config.patch
@@ -50,7 +47,6 @@ BuildRequires:  unixODBC-devel
 BuildRequires:  curl-devel >= 7.13.1
 BuildRequires:  OpenIPMI-devel >= 2
 BuildRequires:  libssh2-devel >= 1.0.0
-BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  libxml2-devel
 BuildRequires:  pcre-devel
 BuildRequires:  libevent-devel
@@ -69,57 +65,57 @@ real-time monitoring of millions of metrics collected from tens of
 thousands of servers, virtual machines and network devices.
 
 %package agent
-Summary:      Zabbix Agent
-Group:        Applications/Internet
-Requires:      logrotate
+Summary:          Zabbix Agent
+Group:            Applications/Internet
+Requires:         logrotate
 Requires(pre):    /usr/sbin/useradd
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
 Requires(preun):  systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Obsoletes:      zabbix
+Obsoletes:        zabbix
 
 %description agent
 Zabbix agent to be installed on monitored systems.
 
 %package get
-Summary:      Zabbix Get
-Group:        Applications/Internet
+Summary:          Zabbix Get
+Group:            Applications/Internet
 
 %description get
 Zabbix get command line utility
 
 %package sender
-Summary:      Zabbix Sender
-Group:        Applications/Internet
+Summary:          Zabbix Sender
+Group:            Applications/Internet
 
 %description sender
 Zabbix sender command line utility
 
 %package proxy-mysql
-Summary:      Zabbix proxy for MySQL or MariaDB database
-Group:        Applications/Internet
-Requires:      fping
+Summary:          Zabbix proxy for MySQL or MariaDB database
+Group:            Applications/Internet
+Requires:         fping
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
-Requires(postun):  systemd
+Requires(postun): systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Provides:      zabbix-proxy = %{version}-%{release}
-Provides:      zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:      zabbix
-Obsoletes:      zabbix-proxy
+Provides:         zabbix-proxy = %{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{version}-%{release}
+Obsoletes:        zabbix
+Obsoletes:        zabbix-proxy
 
 %description proxy-mysql
 Zabbix proxy with MySQL or MariaDB database support.
@@ -129,165 +125,136 @@ Summary:      Zabbix proxy for PostgreSQL database
 Group:        Applications/Internet
 Requires:      fping
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
-Requires(postun):  systemd
+Requires(postun): systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Provides:      zabbix-proxy = %{version}-%{release}
-Provides:      zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:      zabbix
-Obsoletes:      zabbix-proxy
+Provides:         zabbix-proxy = %{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{version}-%{release}
+Obsoletes:        zabbix
+Obsoletes:        zabbix-proxy
 
 %description proxy-pgsql
 Zabbix proxy with PostgreSQL database support.
 
 %package proxy-sqlite3
-Summary:      Zabbix proxy for SQLite3 database
-Group:        Applications/Internet
-Requires:      fping
+Summary:          Zabbix proxy for SQLite3 database
+Group:            Applications/Internet
+Requires:         fping
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
-Requires(postun):  systemd
+Requires(postun): systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Provides:      zabbix-proxy = %{version}-%{release}
-Provides:      zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:      zabbix
-Obsoletes:      zabbix-proxy
+Provides:         zabbix-proxy = %{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{version}-%{release}
+Obsoletes:        zabbix
+Obsoletes:        zabbix-proxy
 
 %description proxy-sqlite3
 Zabbix proxy with SQLite3 database support.
 
-%package java-gateway
-Summary:      Zabbix java gateway
-Group:        Applications/Internet
-%if 0%{?systemd}
-Requires:      java-headless >= 1.6.0
-%else
-Requires:      java >= 1.6.0
-%endif
-%if 0%{?systemd}
-Requires(post):    systemd
-Requires(preun):  systemd
-Requires(postun):  systemd
-%else
-Requires(post):    /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
-%endif
-Obsoletes:      zabbix
-
-%description java-gateway
-Zabbix java gateway
-
 %if 0%{?build_server}
 %package server-mysql
-Summary:      Zabbix server for MySQL or MariaDB database
-Group:        Applications/Internet
-Requires:      fping
+Summary:          Zabbix server for MySQL or MariaDB database
+Group:            Applications/Internet
+Requires:         fping
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
-Requires(postun):  systemd
+Requires(postun): systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Provides:      zabbix-server = %{version}-%{release}
-Provides:      zabbix-server-implementation = %{version}-%{release}
-Obsoletes:      zabbix
-Obsoletes:      zabbix-server
+Provides:         zabbix-server = %{version}-%{release}
+Provides:         zabbix-server-implementation = %{version}-%{release}
+Obsoletes:        zabbix
+Obsoletes:        zabbix-server
 
 %description server-mysql
 Zabbix server with MySQL or MariaDB database support.
 
 %package server-pgsql
-Summary:      Zabbix server for PostgresSQL database
-Group:        Applications/Internet
-Requires:      fping
+Summary:          Zabbix server for PostgresSQL database
+Group:            Applications/Internet
+Requires:         fping
 %if 0%{?systemd}
-Requires(post):    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
-Requires(postun):  systemd
+Requires(postun): systemd
 %else
-Requires(post):    /sbin/chkconfig
+Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig
 Requires(preun):  /sbin/service
-Requires(postun):  /sbin/service
+Requires(postun): /sbin/service
 %endif
-Provides:      zabbix-server = %{version}-%{release}
-Provides:      zabbix-server-implementation = %{version}-%{release}
-Obsoletes:      zabbix
-Obsoletes:      zabbix-server
+Provides:         zabbix-server = %{version}-%{release}
+Provides:         zabbix-server-implementation = %{version}-%{release}
+Obsoletes:        zabbix
+Obsoletes:        zabbix-server
 %description server-pgsql
 Zabbix server with PostgresSQL database support.
 
 %package web
-Summary:      Zabbix web frontend common package
-Group:        Application/Internet
-BuildArch:      noarch
-%if 0%{?systemd}
-Requires:      php >= 5.4
-Requires:      php-gd
-Requires:      php-bcmath
-Requires:      php-mbstring
-Requires:      php-xml
-Requires:      php-ldap
-%endif
-Requires:      dejavu-sans-fonts
-Requires:      zabbix-web-database = %{version}-%{release}
-Requires(post):    %{_sbindir}/update-alternatives
+Summary:          Zabbix web frontend common package
+Group:            Application/Internet
+BuildArch:        noarch
+Requires:         php >= 5.4
+Requires:         php-gd
+Requires:         php-bcmath
+Requires:         php-mbstring
+Requires:         php-xml
+Requires:         php-ldap
+Requires:         dejavu-sans-fonts
+Requires:         zabbix-web-database = %{version}-%{release}
+Requires(post):   %{_sbindir}/update-alternatives
 Requires(preun):  %{_sbindir}/update-alternatives
 
 %description web
 Zabbix web frontend common package
 
 %package web-mysql
-Summary:      Zabbix web frontend for MySQL
-Group:        Applications/Internet
-BuildArch:      noarch
-%if 0%{?systemd}
-Requires:      php-mysql
-%endif
-Requires:      zabbix-web = %{version}-%{release}
-Provides:      zabbix-web-database = %{version}-%{release}
+Summary:          Zabbix web frontend for MySQL
+Group:            Applications/Internet
+BuildArch:        noarch
+Requires:         php-mysql
+Requires:         zabbix-web = %{version}-%{release}
+Provides:         zabbix-web-database = %{version}-%{release}
 
 %description web-mysql
 Zabbix web frontend for MySQL
 
 %package web-pgsql
-Summary:      Zabbix web frontend for PostgreSQL
-Group:        Applications/Internet
-BuildArch:      noarch
-%if 0%{?systemd}
-Requires:      php-pgsql
-%endif
-Requires:      zabbix-web = %{version}-%{release}
-Provides:      zabbix-web-database = %{version}-%{release}
+Summary:          Zabbix web frontend for PostgreSQL
+Group:            Applications/Internet
+BuildArch:        noarch
+Requires:         php-pgsql
+Requires:         zabbix-web = %{version}-%{release}
+Provides:         zabbix-web-database = %{version}-%{release}
 
 %description web-pgsql
 Zabbix web frontend for PostgreSQL
 
 %package web-japanese
-Summary:      Japanese font settings for frontend
-Group:        Applications/Internet
-BuildArch:      noarch
-Requires:      vlgothic-p-fonts
-Requires:      zabbix-web = %{version}-%{release}
-Requires(post):    %{_sbindir}/update-alternatives
+Summary:          Japanese font settings for frontend
+Group:            Applications/Internet
+BuildArch:        noarch
+Requires:         vlgothic-p-fonts
+Requires:         zabbix-web = %{version}-%{release}
+Requires(post):   %{_sbindir}/update-alternatives
 Requires(preun):  %{_sbindir}/update-alternatives
 
 %description web-japanese
@@ -352,7 +319,6 @@ build_flags="
   --enable-agent
   --enable-proxy
   --enable-ipv6
-  --enable-java
   --with-net-snmp
   --with-ldap
   --with-libcurl
@@ -414,9 +380,9 @@ install -m 0755 -p src/zabbix_proxy/zabbix_proxy_* $RPM_BUILD_ROOT%{_sbindir}/
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_proxy
 
 # delete unnecessary files from java gateway
-rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/settings.sh
-rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/startup.sh
-rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/shutdown.sh
+#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/settings.sh
+#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/startup.sh
+#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/shutdown.sh
 
 # install scripts and modules directories
 mkdir -p $RPM_BUILD_ROOT/usr/lib/zabbix
@@ -424,13 +390,6 @@ mkdir -p $RPM_BUILD_ROOT/usr/lib/zabbix
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/alertscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 %endif
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/externalscripts $RPM_BUILD_ROOT/usr/lib/zabbix
-
-%if 0%{?systemd}
-mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback.xml $RPM_BUILD_ROOT/%{_sysconfdir}/zabbix/zabbix_java_gateway_logback.xml
-rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/lib/logback-console.xml
-mv $RPM_BUILD_ROOT%{_sbindir}/zabbix_java $RPM_BUILD_ROOT/%{_datadir}/zabbix-java-gateway
-install -m 0755 -p %{SOURCE14} $RPM_BUILD_ROOT%{_sbindir}/zabbix_java_gateway
-%endif
 
 %if 0%{?build_server}
 # install frontend files
@@ -492,10 +451,6 @@ cat conf/zabbix_proxy.conf | sed \
   -e '/^# SocketDir=.*/a \\nSocketDir=/var/run/zabbix' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_proxy.conf
 
-cat src/zabbix_java/settings.sh | sed \
-  -e 's|^PID_FILE=.*|PID_FILE="/var/run/zabbix/zabbix_java.pid"|g' \
-  > $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_java_gateway.conf
-
 # install logrotate configuration files
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 %if 0%{?build_server}
@@ -517,9 +472,7 @@ install -Dm 0644 -p %{SOURCE10} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
 install -Dm 0644 -p %{SOURCE11} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
 %endif
 install -Dm 0644 -p %{SOURCE12} $RPM_BUILD_ROOT%{_unitdir}/zabbix-proxy.service
-install -Dm 0644 -p %{SOURCE13} $RPM_BUILD_ROOT%{_unitdir}/zabbix-java-gateway.service
 %else
-install -Dm 0755 -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-java-gateway
 install -Dm 0755 -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-agent
 %if 0%{?build_server}
 install -Dm 0755 -p %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-server
@@ -534,7 +487,6 @@ install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
 %endif
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
-install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-java-gateway.conf
 %endif
 
 
@@ -571,13 +523,6 @@ getent passwd zabbix > /dev/null || \
 :
 
 %pre proxy-sqlite3
-getent group zabbix > /dev/null || groupadd -r zabbix
-getent passwd zabbix > /dev/null || \
-  useradd -r -g zabbix -d %{_localstatedir}/lib/zabbix -s /sbin/nologin \
-  -c "Zabbix Monitoring System" zabbix
-:
-
-%pre java-gateway
 getent group zabbix > /dev/null || groupadd -r zabbix
 getent passwd zabbix > /dev/null || \
   useradd -r -g zabbix -d %{_localstatedir}/lib/zabbix -s /sbin/nologin \
@@ -629,14 +574,6 @@ getent passwd zabbix > /dev/null || \
 %endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
   zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3 10
-:
-
-%post java-gateway
-%if 0%{?systemd}
-%systemd_post zabbix-java-gateway.service
-%else
-/sbin/chkconfig --add zabbix-java-gateway
-%endif
 :
 
 %if 0%{?build_server}
@@ -722,17 +659,6 @@ if [ "$1" = 0 ]; then
 fi
 :
 
-%preun java-gateway
-if [ $1 -eq 0 ]; then
-%if 0%{?systemd}
-%systemd_preun zabbix-java-gateway.service
-%else
-/sbin/service zabbix-java-gateway stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-java-gateway
-%endif
-fi
-:
-
 %if 0%{?build_server}
 %preun server-mysql
 if [ "$1" = 0 ]; then
@@ -808,15 +734,6 @@ fi
 %else
 if [ $1 -ge 1 ]; then
 /sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
-fi
-%endif
-
-%postun java-gateway
-%if 0%{?systemd}
-%systemd_postun_with_restart zabbix-java-gateway.service
-%else
-if [ $1 -gt 1 ]; then
-/sbin/service zabbix-java-gateway condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
@@ -925,23 +842,6 @@ fi
 %endif
 %{_sbindir}/zabbix_proxy_sqlite3
 
-%files java-gateway
-%defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING NEWS README
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_java_gateway.conf
-%attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
-%attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
-%if 0%{?systemd}
-%{_datadir}/zabbix-java-gateway
-%{_sbindir}/zabbix_java_gateway
-%{_unitdir}/zabbix-java-gateway.service
-%{_prefix}/lib/tmpfiles.d/zabbix-java-gateway.conf
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_java_gateway_logback.xml
-%else
-%{_sbindir}/zabbix_java
-%{_sysconfdir}/init.d/zabbix-java-gateway
-%endif
-
 %if 0%{?build_server}
 %files server-mysql
 %defattr(-,root,root,-)
@@ -1007,6 +907,9 @@ fi
 
 
 %changelog
+* Thu May  9 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-3
+- Remove Java Gateway
+
 * Tue May  7 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-2
 - Fix tls for fedora and suse
 
