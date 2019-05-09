@@ -362,6 +362,10 @@ build_flags="
   --with-openssl
 "
 
+%if 0%{?build_server}
+build_flags="$build_flags --enable-server"
+%endif
+
 %configure $build_flags --with-sqlite3
 make %{?_smp_mflags}
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
