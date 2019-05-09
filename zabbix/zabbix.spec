@@ -60,9 +60,9 @@ BuildRequires:  libopenssl-devel
 %if 0%{?systemd}
 BuildRequires:  systemd
 %endif
-%if 0%{?build_server}
-BuildRequires:  iksemel-devel
-%endif
+#%if 0%{?build_server}
+#BuildRequires:  iksemel-devel
+#%endif
 
 %description
 Zabbix is the ultimate enterprise-level software designed for
