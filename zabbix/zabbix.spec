@@ -999,6 +999,9 @@ fi
 
 
 %changelog
+* Thu May  9 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-3
+- Remove jabber support
+
 * Tue May  7 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.0.7-2
 - Fix tls for fedora and suse
 
