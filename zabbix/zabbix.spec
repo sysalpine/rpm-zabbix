@@ -60,9 +60,6 @@ BuildRequires:  libopenssl-devel
 %if 0%{?systemd}
 BuildRequires:  systemd
 %endif
-%if 0%{?build_server}
-BuildRequires:  iksemel-devel
-%endif
 
 %description
 Zabbix is the ultimate enterprise-level software designed for
@@ -368,10 +365,6 @@ build_flags="
 %configure $build_flags --with-sqlite3
 make %{?_smp_mflags}
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
-
-%if 0%{?build_server}
-build_flags="$build_flags --enable-server --with-jabber"
-%endif
 
 %configure $build_flags --with-mysql
 make %{?_smp_mflags}
