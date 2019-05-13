@@ -1,6 +1,6 @@
 Name:     zabbix
 Version:  4.2.1
-Release:  3%{?dist}
+Release:  4%{?dist}
 Summary:  The Enterprise-class open source monitoring solution
 Group:    Applications/Internet
 License:  GPLv2+
@@ -230,7 +230,12 @@ Zabbix web frontend common package
 Summary:          Zabbix web frontend for MySQL
 Group:            Applications/Internet
 BuildArch:        noarch
-Requires:         php-mysql
+%if 0%{?rhel} || 0%{?fedora}
+Requires:         php-mysqlnd
+%else
+#suse leap
+Requires:         php7-mysql
+%endif
 Requires:         zabbix-web = %{version}-%{release}
 Provides:         zabbix-web-database = %{version}-%{release}
 
@@ -241,7 +246,12 @@ Zabbix web frontend for MySQL
 Summary:          Zabbix web frontend for PostgreSQL
 Group:            Applications/Internet
 BuildArch:        noarch
+%if 0%{?rhel} || 0%{?fedora}
 Requires:         php-pgsql
+%else
+#suse leap
+Requires:         php7-mysql
+%endif
 Requires:         zabbix-web = %{version}-%{release}
 Provides:         zabbix-web-database = %{version}-%{release}
 
@@ -907,6 +917,9 @@ fi
 
 
 %changelog
+* Mon May 13 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-4
+- Fix php mysql and pgsql requirements
+
 * Thu May  9 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-3
 - Remove Java Gateway
 
