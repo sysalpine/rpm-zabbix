@@ -9,9 +9,6 @@ Source0:  %{name}-%{version}%{?alphatag}.tar.gz
 Source1:  zabbix-web22.conf
 Source2:  zabbix-web24.conf
 Source3:  zabbix-logrotate.in
-Source5:  zabbix-agent.init
-Source6:  zabbix-server.init
-Source7:  zabbix-proxy.init
 Source10: zabbix-agent.service
 Source11: zabbix-server.service
 Source12: zabbix-proxy.service
@@ -23,12 +20,6 @@ Patch2:   fping3-sourceip-option.patch
 Buildroot: %{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %define build_server 1
-
-%if 0%{?rhel} && 0%{?rhel} < 7
-%define systemd 0
-%else
-%define systemd 1
-%endif
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
@@ -55,9 +46,7 @@ BuildRequires:  openssl-devel >= 1.0.1
 %else
 BuildRequires:  libopenssl-devel
 %endif
-%if 0%{?systemd}
 BuildRequires:  systemd
-%endif
 
 %description
 Zabbix is the ultimate enterprise-level software designed for
@@ -69,16 +58,9 @@ Summary:          Zabbix Agent
 Group:            Applications/Internet
 Requires:         logrotate
 Requires(pre):    /usr/sbin/useradd
-%if 0%{?systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(preun):  systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
 Obsoletes:        zabbix
 
 %description agent
@@ -102,16 +84,9 @@ Zabbix sender command line utility
 Summary:          Zabbix proxy for MySQL or MariaDB database
 Group:            Applications/Internet
 Requires:         fping
-%if 0%{?systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
 Provides:         zabbix-proxy = %{version}-%{release}
 Provides:         zabbix-proxy-implementation = %{version}-%{release}
 Obsoletes:        zabbix
@@ -121,19 +96,12 @@ Obsoletes:        zabbix-proxy
 Zabbix proxy with MySQL or MariaDB database support.
 
 %package proxy-pgsql
-Summary:      Zabbix proxy for PostgreSQL database
-Group:        Applications/Internet
-Requires:      fping
-%if 0%{?systemd}
+Summary:          Zabbix proxy for PostgreSQL database
+Group:            Applications/Internet
+Requires:         fping
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
 Provides:         zabbix-proxy = %{version}-%{release}
 Provides:         zabbix-proxy-implementation = %{version}-%{release}
 Obsoletes:        zabbix
@@ -191,16 +159,9 @@ Zabbix server with MySQL or MariaDB database support.
 Summary:          Zabbix server for PostgresSQL database
 Group:            Applications/Internet
 Requires:         fping
-%if 0%{?systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
 Provides:         zabbix-server = %{version}-%{release}
 Provides:         zabbix-server-implementation = %{version}-%{release}
 Obsoletes:        zabbix
@@ -275,7 +236,7 @@ Japanese font configuration for Zabbix web frontend
 %setup0 -q -n %{name}-%{version}%{?alphatag}
 %patch0 -p1
 %patch1 -p1
-%if 0%{?rhel} >= 7  || 0%{?fedora} || 0%{?suse}
+%if 0%{?rhel} >= 7 || 0%{?fedora} || 0%{?suse}
 %patch2 -p1
 %endif
 
@@ -296,9 +257,6 @@ find frontends/php/locale -name '*.sh' | xargs rm -f
 sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/mysql/data.sql
 sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/postgresql/data.sql
 sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/sqlite3/data.sql
-
-# change log directory for Java Gateway
-sed -i -e 's|/tmp/zabbix_java.log|/var/log/zabbix/zabbix_java_gateway.log|g' src/zabbix_java/lib/logback.xml
 
 %if 0%{?build_server}
 # copy sql files for servers
@@ -476,28 +434,18 @@ cat %{SOURCE3} | sed \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-proxy
 
 # install startup scripts
-%if 0%{?systemd}
 install -Dm 0644 -p %{SOURCE10} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
 %if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE11} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
 %endif
 install -Dm 0644 -p %{SOURCE12} $RPM_BUILD_ROOT%{_unitdir}/zabbix-proxy.service
-%else
-install -Dm 0755 -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-agent
-%if 0%{?build_server}
-install -Dm 0755 -p %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-server
-%endif
-install -Dm 0755 -p %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-proxy
-%endif
 
 # install systemd-tmpfiles conf
-%if 0%{?systemd}
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
 %if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
 %endif
 install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
-%endif
 
 
 %clean
@@ -512,11 +460,7 @@ getent passwd zabbix > /dev/null || \
 :
 
 %post agent
-%if 0%{?systemd}
 %systemd_post zabbix-agent.service
-%else
-/sbin/chkconfig --add zabbix-agent || :
-%endif
 
 %pre proxy-mysql
 getent group zabbix > /dev/null || groupadd -r zabbix
@@ -557,52 +501,32 @@ getent passwd zabbix > /dev/null || \
 
 
 %post proxy-mysql
-%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
-%else
-/sbin/chkconfig --add zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
   zabbix-proxy %{_sbindir}/zabbix_proxy_mysql 10
 :
 
 %post proxy-pgsql
-%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
-%else
-/sbin/chkconfig --add zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
   zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql 10
 :
 
 %post proxy-sqlite3
-%if 0%{?systemd}
 %systemd_post zabbix-proxy.service
-%else
-/sbin/chkconfig --add zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
   zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3 10
 :
 
 %if 0%{?build_server}
 %post server-mysql
-%if 0%{?systemd}
 %systemd_post zabbix-server.service
-%else
-/sbin/chkconfig --add zabbix-server
-%endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server \
   zabbix-server %{_sbindir}/zabbix_server_mysql 10
 :
 
 %post server-pgsql
-%if 0%{?systemd}
 %systemd_post zabbix-server.service
-%else
-/sbin/chkconfig --add zabbix-server
-%endif
 /usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server \
   zabbix-server %{_sbindir}/zabbix_server_pgsql 10
 :
@@ -620,24 +544,14 @@ getent passwd zabbix > /dev/null || \
 
 %preun agent
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-agent.service
-%else
-/sbin/service zabbix-agent stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-agent
-%endif
 fi
 :
 
 
 %preun proxy-mysql
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
-%else
-/sbin/service zabbix-proxy stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --remove zabbix-proxy \
 %{_sbindir}/zabbix_proxy_mysql
 fi
@@ -645,12 +559,7 @@ fi
 
 %preun proxy-pgsql
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
-%else
-/sbin/service zabbix-proxy stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --remove zabbix-proxy \
   %{_sbindir}/zabbix_proxy_pgsql
 fi
@@ -658,12 +567,7 @@ fi
 
 %preun proxy-sqlite3
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-proxy.service
-%else
-/sbin/service zabbix-proxy stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-proxy
-%endif
 /usr/sbin/update-alternatives --remove zabbix-proxy \
   %{_sbindir}/zabbix_proxy_sqlite3
 fi
@@ -672,12 +576,7 @@ fi
 %if 0%{?build_server}
 %preun server-mysql
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-server.service
-%else
-/sbin/service zabbix-server stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-server
-%endif
 /usr/sbin/update-alternatives --remove zabbix-server \
   %{_sbindir}/zabbix_server_mysql
 fi
@@ -685,12 +584,7 @@ fi
 
 %preun server-pgsql
 if [ "$1" = 0 ]; then
-%if 0%{?systemd}
 %systemd_preun zabbix-server.service
-%else
-/sbin/service zabbix-server stop >/dev/null 2>&1
-/sbin/chkconfig --del zabbix-server
-%endif
 /usr/sbin/update-alternatives --remove zabbix-server \
   %{_sbindir}/zabbix_server_pgsql
 fi
@@ -712,59 +606,23 @@ fi
 %endif
 
 %postun agent
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-agent.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-agent try-restart >/dev/null 2>&1 || :
-fi
-%endif
 
 %postun proxy-mysql
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
-fi
-%endif
 
 %postun proxy-pgsql
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
-fi
-%endif
 
 %postun proxy-sqlite3
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-proxy.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
-fi
-%endif
 
 %if 0%{?build_server}
 %postun server-mysql
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-server.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-server try-restart >/dev/null 2>&1 || :
-fi
-%endif
 
 %postun server-pgsql
-%if 0%{?systemd}
 %systemd_postun_with_restart zabbix-server.service
-%else
-if [ $1 -ge 1 ]; then
-/sbin/service zabbix-server try-restart >/dev/null 2>&1 || :
-fi
-%endif
 %endif
 
 %files agent
@@ -778,12 +636,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_sbindir}/zabbix_agentd
 %{_mandir}/man8/zabbix_agentd.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-agent.service
 %{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
-%else
-%{_sysconfdir}/init.d/zabbix-agent
-%endif
 
 
 %files get
@@ -808,12 +662,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
-%else
-%{_sysconfdir}/init.d/zabbix-proxy
-%endif
 %{_sbindir}/zabbix_proxy_mysql
 
 %files proxy-pgsql
@@ -826,12 +676,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
-%else
-%{_sysconfdir}/init.d/zabbix-proxy
-%endif
 %{_sbindir}/zabbix_proxy_pgsql
 
 %files proxy-sqlite3
@@ -844,12 +690,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_proxy.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-proxy.service
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
-%else
-%{_sysconfdir}/init.d/zabbix-proxy
-%endif
 %{_sbindir}/zabbix_proxy_sqlite3
 
 %if 0%{?build_server}
@@ -864,12 +706,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_server.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-server.service
 %{_prefix}/lib/tmpfiles.d/zabbix-server.conf
-%else
-%{_sysconfdir}/init.d/zabbix-server
-%endif
 %{_sbindir}/zabbix_server_mysql
 
 %files server-pgsql
@@ -884,12 +722,8 @@ fi
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
 %{_mandir}/man8/zabbix_server.8*
-%if 0%{?systemd}
 %{_unitdir}/zabbix-server.service
 %{_prefix}/lib/tmpfiles.d/zabbix-server.conf
-%else
-%{_sysconfdir}/init.d/zabbix-server
-%endif
 %{_sbindir}/zabbix_server_pgsql
 
 %files web
@@ -898,7 +732,7 @@ fi
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
 %config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
-#%if 0%{?systemd}
+#%if 0%{?rhel} >= 7
 #%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
 #%else
 %doc conf/httpd22-example.conf conf/httpd24-example.conf
