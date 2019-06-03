@@ -1,6 +1,7 @@
 Name:     zabbix
 Version:  4.2.1
 Release:  4%{?dist}
+Epoch:    1
 Summary:  The Enterprise-class open source monitoring solution
 Group:    Applications/Internet
 License:  GPLv2+
@@ -751,6 +752,9 @@ fi
 
 
 %changelog
+* Mon Jun  3 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-5
+- Add Epoch tag
+
 * Mon May 13 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-4
 - Fix php mysql and pgsql requirements
 
