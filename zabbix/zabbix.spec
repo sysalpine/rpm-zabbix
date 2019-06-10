@@ -7,13 +7,11 @@ Group:    Applications/Internet
 License:  GPLv2+
 URL:      http://www.zabbix.com/
 Source0:  %{name}-%{version}%{?alphatag}.tar.gz
-Source1:  zabbix-web22.conf
-Source2:  zabbix-web24.conf
-Source3:  zabbix-logrotate.in
-Source10: zabbix-agent.service
-Source11: zabbix-server.service
-Source12: zabbix-proxy.service
-Source15: zabbix-tmpfiles.conf
+Source1:  zabbix-logrotate.in
+Source2:  zabbix-agent.service
+Source3:  zabbix-server.service
+Source4:  zabbix-proxy.service
+Source5:  zabbix-tmpfiles.conf
 Patch0:   config.patch
 Patch1:   fonts-config.patch
 Patch2:   fping3-sourceip-option.patch
@@ -242,7 +240,7 @@ Japanese font configuration for Zabbix web frontend
 %endif
 
 ## remove font file
-rm -f frontends/php/fonts/DejaVuSans.ttf
+#rm -f frontends/php/fonts/DejaVuSans.ttf
 
 # remove .htaccess files
 rm -f frontends/php/app/.htaccess
@@ -369,14 +367,6 @@ cp -a frontends/php/* $RPM_BUILD_ROOT%{_datadir}/zabbix
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web
 touch $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/zabbix.conf.php
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/conf/maintenance.inc.php $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/
-
-# drop config files in place
-#%if 0%{?rhel} || 0%{?fedora}
-#install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/zabbix.conf
-#%else
-install -Dm 0644 -p %{SOURCE1} conf/httpd22-example.conf
-install -Dm 0644 -p %{SOURCE2} conf/httpd24-example.conf
-#%endif
 %endif
 
 # install configuration files
@@ -423,30 +413,30 @@ cat conf/zabbix_proxy.conf | sed \
 # install logrotate configuration files
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 %if 0%{?build_server}
-cat %{SOURCE3} | sed \
+cat %{SOURCE1} | sed \
   -e 's|COMPONENT|server|g' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-server
 %endif
-cat %{SOURCE3} | sed \
+cat %{SOURCE1} | sed \
   -e 's|COMPONENT|agentd|g' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-agent
-cat %{SOURCE3} | sed \
+cat %{SOURCE1} | sed \
   -e 's|COMPONENT|proxy|g' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-proxy
 
 # install startup scripts
-install -Dm 0644 -p %{SOURCE10} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
+install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
 %if 0%{?build_server}
-install -Dm 0644 -p %{SOURCE11} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
+install -Dm 0644 -p %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
 %endif
-install -Dm 0644 -p %{SOURCE12} $RPM_BUILD_ROOT%{_unitdir}/zabbix-proxy.service
+install -Dm 0644 -p %{SOURCE4} $RPM_BUILD_ROOT%{_unitdir}/zabbix-proxy.service
 
 # install systemd-tmpfiles conf
-install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
+install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
 %if 0%{?build_server}
-install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
+install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
 %endif
-install -Dm 0644 -p %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
+install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 
 
 %clean
