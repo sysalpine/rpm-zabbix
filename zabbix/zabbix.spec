@@ -1,6 +1,6 @@
 Name:     zabbix
-Version:  4.2.1
-Release:  4%{?dist}
+Version:  4.2.3
+Release:  1%{?dist}
 Epoch:    1
 Summary:  The Enterprise-class open source monitoring solution
 Group:    Applications/Internet
@@ -752,6 +752,9 @@ fi
 
 
 %changelog
+* Mon Jun 10 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.3-1
+- Bump zabbix version to 4.2.3
+
 * Mon Jun  3 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-5
 - Add Epoch tag
 
