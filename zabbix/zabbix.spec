@@ -17,8 +17,6 @@ Patch1:   fping3-sourceip-option.patch
 
 Buildroot: %{_tmppath}/zabbix-%{?epoch:%{epoch}:}%{version}-%{release}-root-%(%{__id_u} -n)
 
-%define build_server 1
-
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  make
@@ -116,7 +114,6 @@ Provides:         zabbix-proxy-implementation = %{?epoch:%{epoch}:}%{version}-%{
 %description proxy-sqlite3
 Zabbix proxy with SQLite3 database support.
 
-%if 0%{?build_server}
 %package server-mysql
 Summary:          Zabbix server for MySQL or MariaDB database
 Group:            Applications/Internet
@@ -204,7 +201,6 @@ Requires(preun):  %{_sbindir}/update-alternatives
 
 %description web-japanese
 Japanese font configuration for Zabbix web frontend
-%endif
 
 %prep
 %setup0 -q -n %{name}-%{version}%{?alphatag}
@@ -229,7 +225,6 @@ sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/mysql/data.sql
 sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/postgresql/data.sql
 sed -i -e 's|/usr/bin/traceroute|/bin/traceroute|' database/sqlite3/data.sql
 
-%if 0%{?build_server}
 # copy sql files for servers
 cat database/mysql/schema.sql > database/mysql/create.sql
 cat database/mysql/images.sql >> database/mysql/create.sql
@@ -241,7 +236,6 @@ cat database/postgresql/images.sql >> database/postgresql/create.sql
 cat database/postgresql/data.sql >> database/postgresql/create.sql
 gzip database/postgresql/create.sql
 gzip database/postgresql/timescaledb.sql
-%endif
 
 # sql files for proxyes
 gzip database/mysql/schema.sql
@@ -274,29 +268,20 @@ build_flags="
 make %{?_smp_mflags}
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
 
-%if 0%{?build_server}
 build_flags="$build_flags --enable-server"
-%endif
 
 %configure $build_flags --with-mysql
 make %{?_smp_mflags}
-%if 0%{?build_server}
 mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_mysql
-%endif
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_mysql
 
 %configure $build_flags --with-postgresql
 make %{?_smp_mflags}
-%if 0%{?build_server}
 mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_pgsql
-%endif
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_pgsql
 
-%if 0%{?build_server}
 touch src/zabbix_server/zabbix_server
-%endif
 touch src/zabbix_proxy/zabbix_proxy
-
 
 
 %install
@@ -311,21 +296,16 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/zabbix
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/zabbix
 
 # install server and proxy binaries
-%if 0%{?build_server}
 install -m 0755 -p src/zabbix_server/zabbix_server_* $RPM_BUILD_ROOT%{_sbindir}/
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_server
-%endif
 install -m 0755 -p src/zabbix_proxy/zabbix_proxy_* $RPM_BUILD_ROOT%{_sbindir}/
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_proxy
 
 # install scripts and modules directories
 mkdir -p $RPM_BUILD_ROOT/usr/lib/zabbix
-%if 0%{?build_server}
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/alertscripts $RPM_BUILD_ROOT/usr/lib/zabbix
-%endif
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/externalscripts $RPM_BUILD_ROOT/usr/lib/zabbix
 
-%if 0%{?build_server}
 # install frontend files
 find frontends/php -name '*.orig' | xargs rm -f
 cp -a frontends/php/* $RPM_BUILD_ROOT%{_datadir}/zabbix
@@ -334,14 +314,11 @@ cp -a frontends/php/* $RPM_BUILD_ROOT%{_datadir}/zabbix
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web
 touch $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/zabbix.conf.php
 mv $RPM_BUILD_ROOT%{_datadir}/zabbix/conf/maintenance.inc.php $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/web/
-%endif
 
 # install configuration files
 mv $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.d
 mv $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_proxy.conf.d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_proxy.d
-%if 0%{?build_server}
 mv $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_server.conf.d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_server.d
-%endif
 
 install -dm 755 $RPM_BUILD_ROOT%{_docdir}/zabbix-agent-%{version}
 
@@ -354,7 +331,6 @@ cat conf/zabbix_agentd.conf | sed \
   -e '/^# Include=$/a \\nInclude=%{_sysconfdir}/zabbix/zabbix_agentd.d/*.conf' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf
 
-%if 0%{?build_server}
 cat conf/zabbix_server.conf | sed \
   -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_server.pid' \
   -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/zabbix/zabbix_server.log|g' \
@@ -365,7 +341,6 @@ cat conf/zabbix_server.conf | sed \
   -e '/^# SNMPTrapperFile=.*/a \\nSNMPTrapperFile=/var/log/snmptrap/snmptrap.log' \
   -e '/^# SocketDir=.*/a \\nSocketDir=/var/run/zabbix' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_server.conf
-%endif
 
 cat conf/zabbix_proxy.conf | sed \
   -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_proxy.pid' \
@@ -379,11 +354,9 @@ cat conf/zabbix_proxy.conf | sed \
 
 # install logrotate configuration files
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-%if 0%{?build_server}
 cat %{SOURCE1} | sed \
   -e 's|COMPONENT|server|g' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-server
-%endif
 cat %{SOURCE1} | sed \
   -e 's|COMPONENT|agentd|g' \
   > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-agent
@@ -393,16 +366,12 @@ cat %{SOURCE1} | sed \
 
 # install startup scripts
 install -Dm 0644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_unitdir}/zabbix-agent.service
-%if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/zabbix-server.service
-%endif
 install -Dm 0644 -p %{SOURCE4} $RPM_BUILD_ROOT%{_unitdir}/zabbix-proxy.service
 
 # install systemd-tmpfiles conf
 install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-agent.conf
-%if 0%{?build_server}
 install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-server.conf
-%endif
 install -Dm 0644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 
 
@@ -441,7 +410,6 @@ getent passwd zabbix > /dev/null || \
   -c "Zabbix Monitoring System" zabbix
 :
 
-%if 0%{?build_server}
 %pre server-mysql
 getent group zabbix > /dev/null || groupadd -r zabbix
 getent passwd zabbix > /dev/null || \
@@ -455,50 +423,40 @@ getent passwd zabbix > /dev/null || \
   useradd -r -g zabbix -d %{_localstatedir}/lib/zabbix -s /sbin/nologin \
   -c "Zabbix Monitoring System" zabbix
 :
-%endif
 
 
 %post proxy-mysql
 %systemd_post zabbix-proxy.service
-/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
-  zabbix-proxy %{_sbindir}/zabbix_proxy_mysql 10
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_mysql 10
 :
 
 %post proxy-pgsql
 %systemd_post zabbix-proxy.service
-/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
-  zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql 10
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql 10
 :
 
 %post proxy-sqlite3
 %systemd_post zabbix-proxy.service
-/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy \
-  zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3 10
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3 10
 :
 
-%if 0%{?build_server}
 %post server-mysql
 %systemd_post zabbix-server.service
-/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server \
-  zabbix-server %{_sbindir}/zabbix_server_mysql 10
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server zabbix-server %{_sbindir}/zabbix_server_mysql 10
 :
 
 %post server-pgsql
 %systemd_post zabbix-server.service
-/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server \
-  zabbix-server %{_sbindir}/zabbix_server_pgsql 10
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server zabbix-server %{_sbindir}/zabbix_server_pgsql 10
 :
 
 %post web
-/usr/sbin/update-alternatives --install %{_datadir}/zabbix/fonts/graphfont.ttf \
-  zabbix-web-font %{_datadir}/fonts/dejavu/DejaVuSans.ttf 10
+/usr/sbin/update-alternatives --install %{_datadir}/zabbix/fonts/graphfont.ttf zabbix-web-font %{_datadir}/fonts/dejavu/DejaVuSans.ttf 10
 :
 
 %post web-japanese
-/usr/sbin/update-alternatives --install %{_datadir}/zabbix/fonts/graphfont.ttf \
-  zabbix-web-font %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf 20
+/usr/sbin/update-alternatives --install %{_datadir}/zabbix/fonts/graphfont.ttf zabbix-web-font %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf 20
 :
-%endif
 
 %preun agent
 if [ "$1" = 0 ]; then
@@ -506,62 +464,52 @@ if [ "$1" = 0 ]; then
 fi
 :
 
-
 %preun proxy-mysql
-if [ "$1" = 0 ]; then
 %systemd_preun zabbix-proxy.service
-/usr/sbin/update-alternatives --remove zabbix-proxy \
-%{_sbindir}/zabbix_proxy_mysql
+if [ "$1" = 0 ]; then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_mysql
 fi
 :
 
 %preun proxy-pgsql
-if [ "$1" = 0 ]; then
 %systemd_preun zabbix-proxy.service
-/usr/sbin/update-alternatives --remove zabbix-proxy \
-  %{_sbindir}/zabbix_proxy_pgsql
+if [ "$1" = 0 ]; then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql
 fi
 :
 
 %preun proxy-sqlite3
-if [ "$1" = 0 ]; then
 %systemd_preun zabbix-proxy.service
-/usr/sbin/update-alternatives --remove zabbix-proxy \
-  %{_sbindir}/zabbix_proxy_sqlite3
+if [ "$1" = 0 ]; then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3
 fi
 :
 
-%if 0%{?build_server}
+%systemd_preun zabbix-server.service
 %preun server-mysql
 if [ "$1" = 0 ]; then
-%systemd_preun zabbix-server.service
-/usr/sbin/update-alternatives --remove zabbix-server \
-  %{_sbindir}/zabbix_server_mysql
+  /usr/sbin/update-alternatives --remove zabbix-server %{_sbindir}/zabbix_server_mysql
 fi
 :
 
 %preun server-pgsql
-if [ "$1" = 0 ]; then
 %systemd_preun zabbix-server.service
-/usr/sbin/update-alternatives --remove zabbix-server \
-  %{_sbindir}/zabbix_server_pgsql
+if [ "$1" = 0 ]; then
+  /usr/sbin/update-alternatives --remove zabbix-server %{_sbindir}/zabbix_server_pgsql
 fi
 :
 
 %preun web
 if [ "$1" = 0 ]; then
-/usr/sbin/update-alternatives --remove zabbix-web-font \
-  %{_datadir}/fonts/dejavu/DejaVuSans.ttf
+  /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/fonts/dejavu/DejaVuSans.ttf
 fi
 :
 
 %preun web-japanese
 if [ "$1" = 0 ]; then
-/usr/sbin/update-alternatives --remove zabbix-web-font \
-  %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf
+  /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf
 fi
 :
-%endif
 
 %postun agent
 %systemd_postun_with_restart zabbix-agent.service
@@ -575,13 +523,12 @@ fi
 %postun proxy-sqlite3
 %systemd_postun_with_restart zabbix-proxy.service
 
-%if 0%{?build_server}
 %postun server-mysql
 %systemd_postun_with_restart zabbix-server.service
 
 %postun server-pgsql
 %systemd_postun_with_restart zabbix-server.service
-%endif
+
 
 %files agent
 %defattr(-,root,root,-)
@@ -652,7 +599,6 @@ fi
 %{_prefix}/lib/tmpfiles.d/zabbix-proxy.conf
 %{_sbindir}/zabbix_proxy_sqlite3
 
-%if 0%{?build_server}
 %files server-mysql
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING NEWS README
@@ -700,7 +646,6 @@ fi
 
 %files web-japanese
 %defattr(-,root,root,-)
-%endif
 
 
 %changelog
@@ -721,5 +666,4 @@ fi
 
 * Sat May  4 2019 Paul Trunk <ptrunk@sysalpine.com> - 4.2.1-1
 - Initial packages
-
 
