@@ -719,11 +719,6 @@ fi
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
 %config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
-#%if 0%{?rhel} >= 7
-#%config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
-#%else
-%doc conf/httpd22-example.conf conf/httpd24-example.conf
-#%endif
 %{_datadir}/zabbix
 
 %files web-mysql
