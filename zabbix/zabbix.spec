@@ -15,7 +15,7 @@ Source5:  zabbix-tmpfiles.conf
 Patch0:   config.patch
 Patch1:   fping3-sourceip-option.patch
 
-Buildroot: %{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
+Buildroot: %{_tmppath}/zabbix-%{?epoch:%{epoch}:}%{version}-%{release}-root-%(%{__id_u} -n)
 
 %define build_server 1
 
@@ -59,7 +59,6 @@ Requires(pre):    /usr/sbin/useradd
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(preun):  systemd
-Obsoletes:        zabbix
 
 %description agent
 Zabbix agent to be installed on monitored systems.
@@ -85,10 +84,8 @@ Requires:         fping
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-Provides:         zabbix-proxy = %{version}-%{release}
-Provides:         zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:        zabbix
-Obsoletes:        zabbix-proxy
+Provides:         zabbix-proxy = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description proxy-mysql
 Zabbix proxy with MySQL or MariaDB database support.
@@ -100,10 +97,8 @@ Requires:         fping
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-Provides:         zabbix-proxy = %{version}-%{release}
-Provides:         zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:        zabbix
-Obsoletes:        zabbix-proxy
+Provides:         zabbix-proxy = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description proxy-pgsql
 Zabbix proxy with PostgreSQL database support.
@@ -112,20 +107,11 @@ Zabbix proxy with PostgreSQL database support.
 Summary:          Zabbix proxy for SQLite3 database
 Group:            Applications/Internet
 Requires:         fping
-%if 0%{?systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
-Provides:         zabbix-proxy = %{version}-%{release}
-Provides:         zabbix-proxy-implementation = %{version}-%{release}
-Obsoletes:        zabbix
-Obsoletes:        zabbix-proxy
+Provides:         zabbix-proxy = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-proxy-implementation = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description proxy-sqlite3
 Zabbix proxy with SQLite3 database support.
@@ -135,20 +121,11 @@ Zabbix proxy with SQLite3 database support.
 Summary:          Zabbix server for MySQL or MariaDB database
 Group:            Applications/Internet
 Requires:         fping
-%if 0%{?systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-%else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(postun): /sbin/service
-%endif
-Provides:         zabbix-server = %{version}-%{release}
-Provides:         zabbix-server-implementation = %{version}-%{release}
-Obsoletes:        zabbix
-Obsoletes:        zabbix-server
+Provides:         zabbix-server = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-server-implementation = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description server-mysql
 Zabbix server with MySQL or MariaDB database support.
@@ -160,10 +137,9 @@ Requires:         fping
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-Provides:         zabbix-server = %{version}-%{release}
-Provides:         zabbix-server-implementation = %{version}-%{release}
-Obsoletes:        zabbix
-Obsoletes:        zabbix-server
+Provides:         zabbix-server = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-server-implementation = %{?epoch:%{epoch}:}%{version}-%{release}
+
 %description server-pgsql
 Zabbix server with PostgresSQL database support.
 
@@ -178,7 +154,7 @@ Requires:         php-mbstring
 Requires:         php-xml
 Requires:         php-ldap
 Requires:         dejavu-sans-fonts
-Requires:         zabbix-web-database = %{version}-%{release}
+Requires:         zabbix-web-database = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires(post):   %{_sbindir}/update-alternatives
 Requires(preun):  %{_sbindir}/update-alternatives
 
@@ -195,8 +171,8 @@ Requires:         php-mysqlnd
 #suse leap
 Requires:         php7-mysql
 %endif
-Requires:         zabbix-web = %{version}-%{release}
-Provides:         zabbix-web-database = %{version}-%{release}
+Requires:         zabbix-web = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-web-database = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description web-mysql
 Zabbix web frontend for MySQL
@@ -209,10 +185,10 @@ BuildArch:        noarch
 Requires:         php-pgsql
 %else
 #suse leap
-Requires:         php7-mysql
+Requires:         php7-pgsql
 %endif
-Requires:         zabbix-web = %{version}-%{release}
-Provides:         zabbix-web-database = %{version}-%{release}
+Requires:         zabbix-web = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:         zabbix-web-database = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description web-pgsql
 Zabbix web frontend for PostgreSQL
@@ -222,7 +198,7 @@ Summary:          Japanese font settings for frontend
 Group:            Applications/Internet
 BuildArch:        noarch
 Requires:         vlgothic-p-fonts
-Requires:         zabbix-web = %{version}-%{release}
+Requires:         zabbix-web = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires(post):   %{_sbindir}/update-alternatives
 Requires(preun):  %{_sbindir}/update-alternatives
 
@@ -341,11 +317,6 @@ rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_server
 %endif
 install -m 0755 -p src/zabbix_proxy/zabbix_proxy_* $RPM_BUILD_ROOT%{_sbindir}/
 rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_proxy
-
-# delete unnecessary files from java gateway
-#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/settings.sh
-#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/startup.sh
-#rm $RPM_BUILD_ROOT%{_sbindir}/zabbix_java/shutdown.sh
 
 # install scripts and modules directories
 mkdir -p $RPM_BUILD_ROOT/usr/lib/zabbix
