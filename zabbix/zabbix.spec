@@ -1,5 +1,5 @@
 Name:     zabbix
-Version:  4.2.3
+Version:  4.2.4
 Release:  1%{?dist}
 Epoch:    1
 Summary:  The Enterprise-class open source monitoring solution
