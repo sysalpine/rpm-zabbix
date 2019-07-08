@@ -13,7 +13,6 @@ Source3:  zabbix-server.service
 Source4:  zabbix-proxy.service
 Source5:  zabbix-tmpfiles.conf
 Patch0:   config.patch
-Patch1:   fping3-sourceip-option.patch
 
 Buildroot: %{_tmppath}/zabbix-%{?epoch:%{epoch}:}%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -205,7 +204,6 @@ Japanese font configuration for Zabbix web frontend
 %prep
 %setup0 -q -n %{name}-%{version}%{?alphatag}
 %patch0 -p1
-%patch1 -p1
 
 ## remove font file
 #rm -f frontends/php/fonts/DejaVuSans.ttf
